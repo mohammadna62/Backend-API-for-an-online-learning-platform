@@ -17,5 +17,19 @@ router
     isAdminMiddleware,
     coursesController.create
   );
+router
+  .route("/:id/sessions")
+  .post(
+    // multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single(
+    //   "video"
+    // ),
+    authMiddleware,
+    isAdminMiddleware,
+    coursesController.createSession
+  );
+
+router.route('/sessions/').get(coursesController.getAllSessions)
+
+
 
 module.exports = router;
