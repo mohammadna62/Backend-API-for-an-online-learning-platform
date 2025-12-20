@@ -32,4 +32,5 @@ router.route('/sessions/').get(coursesController.getAllSessions)
 
 router.route("/:href/:sessionID").get(coursesController.getSessionInfo)
 
+router.route("/sessions/:id").delete(authMiddleware,isAdminMiddleware,coursesController.removeSession)
 module.exports = router;

@@ -1,6 +1,6 @@
 const courseModel = require("./../../models/course");
 const sessionModel = require("./../../models/session");
-
+const { default: mongoose } = require("mongoose");
 exports.create = async (req, res) => {
   const {
     name,
@@ -57,9 +57,22 @@ exports.getAllSessions = async (req, res) => {
   return res.json(sessions);
 };
 
-exports.getSessionInfo = async (req , res)=>{
-const course = await courseModel.findOne({href : req.params.href}).lean()
-const session = await sessionModel.findOne({_id:req.params.sessionID})
-const sessions = await sessionModel.find({course:course._id})
-return res.json({session,sessions})
-}
+exports.getSessionInfo = async (req, res) => {
+  const course = await courseModel.findOne({ href: req.params.href }).lean();
+  const session = await sessionModel.findOne({ _id: req.params.sessionID });
+  const sessions = await sessionModel.find({ course: course._id });
+  return res.json({ session, sessions });
+};
+
+exports.removeSession = async (req, res) => {
+  const { id } = req.params;
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+  if (!isValid) {
+    return res.status(409).json({ message: " course id is not valid" });
+  }
+  const deleteCourse = await sessionModel.findByIdAndDelete({ _id: id });
+  if (!deleteCourse) {
+    return res.status(404).json({ message: "course not found" });
+  }
+  return res.status(200).json(deleteCourse);
+};
