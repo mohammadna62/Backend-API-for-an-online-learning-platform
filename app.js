@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const bodyParser = require("body-parser");
 const usersRouter = require("./routes/v1/user");
+const commentsRouter = require("./routes/v1/comment");
 const categoriesRouter = require("./routes/v1/category");
 const coursesRouter = require("./routes/v1/course");
 
@@ -20,5 +21,6 @@ app.use("/v1/auth", authRouter);
 app.use("/v1/users", usersRouter);
 app.use("/v1/category", categoriesRouter);
 app.use("/v1/courses", coursesRouter);
+app.use("/v1/comments", commentsRouter);
 
 module.exports = app;
