@@ -30,6 +30,6 @@ router
 
 router.route('/sessions/').get(coursesController.getAllSessions)
 
-
+router.route("/:href/:sessionID").get(coursesController.getSessionInfo)
 
 module.exports = router;
