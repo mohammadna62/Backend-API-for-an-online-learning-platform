@@ -1,5 +1,6 @@
 const courseModel = require("./../../models/course");
 const sessionModel = require("./../../models/session");
+const courseUserModel = require("./../../models/course-user");
 const { default: mongoose } = require("mongoose");
 exports.create = async (req, res) => {
   const {
@@ -75,4 +76,24 @@ exports.removeSession = async (req, res) => {
     return res.status(404).json({ message: "course not found" });
   }
   return res.status(200).json(deleteCourse);
+};
+
+exports.register = async (req, res) => {
+  const isUserAlreadyRegistered = await courseUserModel
+    .findOne({
+      user: req.user._id,
+      course: req.params.id,
+    })
+    .lean();
+  if (isUserAlreadyRegistered) {
+    return res
+      .status(409)
+      .json({ message: "user Already registered  in this course" });
+  }
+  const register = await courseUserModel.create({
+    user: req.user._id,
+    course: req.params.id,
+    price: req.body.price,
+  });
+  return res.status(201).json({message : "you are registered " })
 };
