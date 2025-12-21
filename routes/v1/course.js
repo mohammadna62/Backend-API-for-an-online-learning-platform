@@ -17,20 +17,29 @@ router
     isAdminMiddleware,
     coursesController.create
   );
+  router.route("/:href/").get(coursesController.getOne)
 router
-  .route("/:id/sessions")
-  .post(
-    // multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single(
-    //   "video"
-    // ),
+  .route("/category/:href")
+  .get(
     authMiddleware,
     isAdminMiddleware,
-    coursesController.createSession
+    coursesController.getCoursesByCategory
   );
- router.route("/:id/register").post(authMiddleware,coursesController.register )
-router.route('/sessions/').get(coursesController.getAllSessions)
+router.route("/:id/sessions").post(
+  // multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single(
+  //   "video"
+  // ),
+  authMiddleware,
+  isAdminMiddleware,
+  coursesController.createSession
+);
+router.route("/:id/register").post(authMiddleware, coursesController.register);
+router.route("/sessions/").get(coursesController.getAllSessions);
 
-router.route("/:href/:sessionID").get(coursesController.getSessionInfo)
+router.route("/:href/:sessionID").get(coursesController.getSessionInfo);
 
-router.route("/sessions/:id").delete(authMiddleware,isAdminMiddleware,coursesController.removeSession)
+router
+  .route("/sessions/:id")
+  .delete(authMiddleware, isAdminMiddleware, coursesController.removeSession);
+
 module.exports = router;

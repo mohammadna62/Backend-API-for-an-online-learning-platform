@@ -1,7 +1,10 @@
 const courseModel = require("./../../models/course");
+const categoryModel = require("./../../models/category");
 const sessionModel = require("./../../models/session");
+const commentsModel = require("./../../models/comment");
 const courseUserModel = require("./../../models/course-user");
-const { default: mongoose } = require("mongoose");
+const isAdmin = require("../../middlewares/isAdmin");
+
 exports.create = async (req, res) => {
   const {
     name,
@@ -33,7 +36,17 @@ exports.create = async (req, res) => {
 
   return res.status(201).json(mainCourse);
 };
+exports.getOne = async (req, res) => {
+  const course = await courseModel
+    .findOne({ href: req.params.href })
+    .populate("creator", "-password")
+    .populate("categoryID");
 
+  const sessions = await sessionModel.find({ course: course._id }).lean();
+  const comments = await commentsModel.find({ course: course._id , isAccept: 1}).populate("creator","-password").lean();
+  const courseStudentsCount = await courseUserModel.find({course:course._id}).countDocuments()
+  res.json({ course, sessions,comments ,courseStudentsCount});
+};
 exports.createSession = async (req, res) => {
   const { title, free, time } = req.body;
   const { id } = req.params;
@@ -95,5 +108,16 @@ exports.register = async (req, res) => {
     course: req.params.id,
     price: req.body.price,
   });
-  return res.status(201).json({message : "you are registered " })
+  return res.status(201).json({ message: "you are registered " });
+};
+exports.getCoursesByCategory = async (req, res) => {
+  const category = await categoryModel
+    .findOne({ href: req.params.href })
+    .lean();
+  if (category) {
+    const courses = await courseModel.find({ categoryID: category._id }).lean();
+    return res.status(200).json(courses);
+  } else {
+    return res.status(404).json({ message: " category not found" });
+  }
 };
