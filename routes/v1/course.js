@@ -17,7 +17,7 @@ router
     isAdminMiddleware,
     coursesController.create
   );
-  router.route("/:href/").get(coursesController.getOne)
+  router.route("/:href/").get(authMiddleware,coursesController.getOne)
 router
   .route("/category/:href")
   .get(

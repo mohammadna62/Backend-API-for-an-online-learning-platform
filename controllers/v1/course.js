@@ -43,9 +43,19 @@ exports.getOne = async (req, res) => {
     .populate("categoryID");
 
   const sessions = await sessionModel.find({ course: course._id }).lean();
-  const comments = await commentsModel.find({ course: course._id , isAccept: 1}).populate("creator","-password").lean();
-  const courseStudentsCount = await courseUserModel.find({course:course._id}).countDocuments()
-  res.json({ course, sessions,comments ,courseStudentsCount});
+  const comments = await commentsModel
+    .find({ course: course._id, isAccept: 1 })
+    .populate("creator", "-password")
+    .lean();
+  const courseStudentsCount = await courseUserModel
+    .find({ course: course._id })
+    .countDocuments();
+  const isUserRegisteredToThisCourse = !!(await courseUserModel.findOne({
+    user: req.user._id,
+    course: course._id,
+  }));
+
+  res.json({ course, sessions, comments, courseStudentsCount,isUserRegisteredToThisCourse });
 };
 exports.createSession = async (req, res) => {
   const { title, free, time } = req.body;
