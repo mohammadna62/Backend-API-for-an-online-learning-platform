@@ -17,7 +17,8 @@ router
     isAdminMiddleware,
     coursesController.create
   );
-  router.route("/:href/").get(authMiddleware,coursesController.getOne)
+router.route("/:href").get(authMiddleware, coursesController.getOne);
+router.route("/:id").delete(authMiddleware,isAdminMiddleware, coursesController.remove);
 router
   .route("/category/:href")
   .get(

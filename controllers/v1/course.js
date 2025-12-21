@@ -1,3 +1,4 @@
+const mongoose = require("mongoose")
 const courseModel = require("./../../models/course");
 const categoryModel = require("./../../models/category");
 const sessionModel = require("./../../models/session");
@@ -55,7 +56,13 @@ exports.getOne = async (req, res) => {
     course: course._id,
   }));
 
-  res.json({ course, sessions, comments, courseStudentsCount,isUserRegisteredToThisCourse });
+  res.json({
+    course,
+    sessions,
+    comments,
+    courseStudentsCount,
+    isUserRegisteredToThisCourse,
+  });
 };
 exports.createSession = async (req, res) => {
   const { title, free, time } = req.body;
@@ -131,3 +138,21 @@ exports.getCoursesByCategory = async (req, res) => {
     return res.status(404).json({ message: " category not found" });
   }
 };
+
+exports.remove = async (req , res)=>{
+  const isObjectIdValid = mongoose.Types.ObjectId.isValid(req.params.id)
+  if (!isObjectIdValid){
+    return res.status(409).json({
+      message:"course id is not valid"
+    })
+  }
+  const deletedCourse = await courseModel.findByIdAndDelete({
+    _id : req.params.id,
+  })
+  if(!deletedCourse){
+    return res.status(404).json({
+      message:"course not found"
+    })
+  }
+  return res.json(deletedCourse)
+}
