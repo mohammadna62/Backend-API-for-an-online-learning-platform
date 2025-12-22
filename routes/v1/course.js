@@ -19,6 +19,7 @@ router
   );
 router.route("/:href").get(authMiddleware, coursesController.getOne);
 router.route("/:id").delete(authMiddleware,isAdminMiddleware, coursesController.remove);
+router.route("/related/:href").get(coursesController.getRelated)
 router
   .route("/category/:href")
   .get(
