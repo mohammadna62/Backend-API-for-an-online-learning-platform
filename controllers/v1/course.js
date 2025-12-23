@@ -1,10 +1,11 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 const courseModel = require("./../../models/course");
 const categoryModel = require("./../../models/category");
 const sessionModel = require("./../../models/session");
 const commentsModel = require("./../../models/comment");
 const courseUserModel = require("./../../models/course-user");
 const isAdmin = require("../../middlewares/isAdmin");
+const { answer } = require("./comment");
 
 exports.create = async (req, res) => {
   const {
@@ -47,6 +48,7 @@ exports.getOne = async (req, res) => {
   const comments = await commentsModel
     .find({ course: course._id, isAccept: 1 })
     .populate("creator", "-password")
+    .populate("course")
     .lean();
   const courseStudentsCount = await courseUserModel
     .find({ course: course._id })
@@ -56,10 +58,24 @@ exports.getOne = async (req, res) => {
     course: course._id,
   }));
 
+  let allComments = [];
+comments.forEach((comment) => {
+    comments.forEach((answerComment) => {
+      if (String(comment._id) == String(answerComment.mainCommentID)) {
+        allComments.push({
+          ...comment,
+          course: comment.course.name,
+          creator: comment.creator.name,
+          answerComment,
+        });
+      }
+    });
+  });
+
   res.json({
     course,
     sessions,
-    comments,
+    comments: allComments,
     courseStudentsCount,
     isUserRegisteredToThisCourse,
   });
@@ -139,33 +155,34 @@ exports.getCoursesByCategory = async (req, res) => {
   }
 };
 
-exports.remove = async (req , res)=>{
-  const isObjectIdValid = mongoose.Types.ObjectId.isValid(req.params.id)
-  if (!isObjectIdValid){
+exports.remove = async (req, res) => {
+  const isObjectIdValid = mongoose.Types.ObjectId.isValid(req.params.id);
+  if (!isObjectIdValid) {
     return res.status(409).json({
-      message:"course id is not valid"
-    })
+      message: "course id is not valid",
+    });
   }
   const deletedCourse = await courseModel.findByIdAndDelete({
-    _id : req.params.id,
-  })
-  if(!deletedCourse){
+    _id: req.params.id,
+  });
+  if (!deletedCourse) {
     return res.status(404).json({
-      message:"course not found"
-    })
+      message: "course not found",
+    });
   }
-  return res.json(deletedCourse)
-}
+  return res.json(deletedCourse);
+};
 
-exports.getRelated = async (req , res)=>{
-  const {href} = req.params
-  const course = await courseModel.findOne({href})
-  if(!course){
-    return res.status(404).json({message : " Course Not Found"})
+exports.getRelated = async (req, res) => {
+  const { href } = req.params;
+  const course = await courseModel.findOne({ href });
+  if (!course) {
+    return res.status(404).json({ message: " Course Not Found" });
   }
-  let relatedCourses = await courseModel.find({categoryID:course.categoryID})
+  let relatedCourses = await courseModel.find({
+    categoryID: course.categoryID,
+  });
 
-  relatedCourses = relatedCourses.filter(course=>course.href!==href)
-  return res.status(200).json(relatedCourses)
-
-}
+  relatedCourses = relatedCourses.filter((course) => course.href !== href);
+  return res.status(200).json(relatedCourses);
+};
