@@ -188,33 +188,26 @@ exports.getRelated = async (req, res) => {
 };
 
 exports.popular = async (req, res) => {
-  const courseHref = await courseUserModel.find({}).populate("course", "href");
-  const coursesName = await courseModel.find({});
-  let courseTitle = [];
+  let coursesTitle = [];
+  let courseCountOfTitle = {};
+  const courses = await courseModel.find({});
 
-  coursesName.forEach((course) => {
-    courseTitle.push(course.href);
+  courses.forEach((course) => {
+    coursesTitle.push(course.href);
+    courseCountOfTitle[course.href] = null;
   });
-for (const item of courseTitle){
-  const countOfCourse = await courseUserModel.findOne({}).populate({
-   path : 'course' ,
-   match : {href: item}
-  })
-}
 
+  for (const name of coursesTitle) {
+    const courseId = await courseModel.findOne({ href: name });
+    const countOfCourseRegistered = await courseUserModel.countDocuments({
+      course: courseId._id,
+    });
+    courseCountOfTitle[name] = countOfCourseRegistered;
+  }
 
-
-
-  
-// for (const item of courseTitle) {
-//   const count = await courseUserModel.countDocuments({ href: item });
-//   console.log(item, count);
-// }
-  return res.json(courseTitle);
+  return res.json(courseCountOfTitle);
 };
 exports.presell = async (req, res) => {
-  const presell = await courseModel.find({status:"پیش فروش"}).lean()
-  return res.status(200).json(presell)
-
-
+  const presell = await courseModel.find({ status: "پیش فروش" }).lean();
+  return res.status(200).json(presell);
 };
