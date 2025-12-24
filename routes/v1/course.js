@@ -7,6 +7,8 @@ const isAdminMiddleware = require("./../../middlewares/isAdmin");
 
 const router = express.Router();
 
+router.route("/popular").get(coursesController.popular)
+router.route("/presell").get(coursesController.presell)
 router
   .route("/")
   .post(

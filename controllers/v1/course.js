@@ -59,7 +59,7 @@ exports.getOne = async (req, res) => {
   }));
 
   let allComments = [];
-comments.forEach((comment) => {
+  comments.forEach((comment) => {
     comments.forEach((answerComment) => {
       if (String(comment._id) == String(answerComment.mainCommentID)) {
         allComments.push({
@@ -185,4 +185,36 @@ exports.getRelated = async (req, res) => {
 
   relatedCourses = relatedCourses.filter((course) => course.href !== href);
   return res.status(200).json(relatedCourses);
+};
+
+exports.popular = async (req, res) => {
+  const courseHref = await courseUserModel.find({}).populate("course", "href");
+  const coursesName = await courseModel.find({});
+  let courseTitle = [];
+
+  coursesName.forEach((course) => {
+    courseTitle.push(course.href);
+  });
+for (const item of courseTitle){
+  const countOfCourse = await courseUserModel.findOne({}).populate({
+   path : 'course' ,
+   match : {href: item}
+  })
+}
+
+
+
+
+  
+// for (const item of courseTitle) {
+//   const count = await courseUserModel.countDocuments({ href: item });
+//   console.log(item, count);
+// }
+  return res.json(courseTitle);
+};
+exports.presell = async (req, res) => {
+  const presell = await courseModel.find({status:"پیش فروش"}).lean()
+  return res.status(200).json(presell)
+
+
 };
