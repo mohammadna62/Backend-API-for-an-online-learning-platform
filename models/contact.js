@@ -13,11 +13,11 @@ const schema = mongoose.Schema({
     type: String,
     required: true,
   },
-  answe: {
+  answer: {
     type: String,
     required: true,
   },
-  name: {
+  body: {
     type: String,
     required: true,
   },
