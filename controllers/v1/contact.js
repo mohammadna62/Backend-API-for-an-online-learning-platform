@@ -1,3 +1,4 @@
+const nodemailer = require("nodemailer");
 const contactModel = require("./../../models/contact");
 const mongoose = require("mongoose");
 
@@ -19,13 +20,38 @@ exports.create = async (req, res) => {
 exports.remove = async (req, res) => {
   const { id } = req.params;
   const isValid = mongoose.Types.ObjectId.isValid(id);
-  if(!isValid){
-    return res.status(409).json({message:"contact Id is not valid"})
+  if (!isValid) {
+    return res.status(409).json({ message: "contact Id is not valid" });
   }
-  const deleteContact = await contactModel.findOneAndDelete({_id:id})
-  if(!deleteContact){
-    return res.status(404).json({message:"contact not found"})
+  const deleteContact = await contactModel.findOneAndDelete({ _id: id });
+  if (!deleteContact) {
+    return res.status(404).json({ message: "contact not found" });
   }
-  return res.status(201).json({message: "contact deleted" ,deleteContact})
+  return res.status(201).json({ message: "contact deleted", deleteContact });
 };
-exports.answer = async (req, res) => {};
+exports.answer = async (req, res) => {
+  
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "adorable.creaturee@gmail.com",
+      pass: "lxno cqky yssx jjtr"
+    },
+  });
+  const mailOption ={
+    from:"adorable.creaturee@gmail.com",
+    to:req.body.email,
+    subject : "ایمیل مهم برای شما ",
+    text:req.body.answer
+  }
+ 
+  transporter.sendMail(mailOption,async(error, info)=>{
+   if(error){
+    return res.status(422).json({message: error})
+   }else{
+     const contact = await contactModel.findOneAndUpdate({ email: req.body.email},{answer : 1})
+    return res.status(200).json({message:"Email sent successfully"})
+   } 
+    
+  })
+};
