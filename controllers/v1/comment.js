@@ -1,4 +1,4 @@
-const mongoose = require ('mongoose')
+const mongoose = require("mongoose");
 const commentModel = require("./../../models/comment");
 const courseModel = require("./../../models/course");
 
@@ -6,8 +6,8 @@ exports.create = async (req, res) => {
   const { body, courseHref, score } = req.body;
 
   const course = await courseModel.findOne({ href: courseHref }).lean();
-  if (!course){
-    return res.status(404).json({message:" this course is not available"})
+  if (!course) {
+    return res.status(404).json({ message: " this course is not available" });
   }
   const comment = await commentModel.create({
     body,
@@ -17,63 +17,92 @@ exports.create = async (req, res) => {
     isAnswer: 0,
     isAccept: 0,
   });
-  return res.status(201).json(comment)
+  return res.status(201).json(comment);
 };
-exports.remove = async (req , res)=>{
-  const {id}= req.params
-  const isValid = mongoose.Types.ObjectId.isValid(id)
-  if (!isValid){
-    return res.status(409).json({message : "comment ID is not valid"})
+exports.remove = async (req, res) => {
+  const { id } = req.params;
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+  if (!isValid) {
+    return res.status(409).json({ message: "comment ID is not valid" });
   }
-  const deletedComment = await commentModel.findOneAndDelete({_id :id})
-  if (!deletedComment){
-   return res.status(404).json({message:"comment not found"})
+  const deletedComment = await commentModel.findOneAndDelete({ _id: id });
+  if (!deletedComment) {
+    return res.status(404).json({ message: "comment not found" });
   }
-    return res.status(200).json(deletedComment)
-}
-exports.accept = async (req , res)=>{
-    const {id}= req.params
-  const isValid = mongoose.Types.ObjectId.isValid(id)
-  if (!isValid){
-    return res.status(409).json({message : "comment ID is not valid"})
+  return res.status(200).json(deletedComment);
+};
+exports.accept = async (req, res) => {
+  const { id } = req.params;
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+  if (!isValid) {
+    return res.status(409).json({ message: "comment ID is not valid" });
   }
-  const acceptedComment = await commentModel.findOneAndUpdate({_id : id}, {isAccept:1})
-   if (!acceptedComment){
-   return res.status(404).json({message:"comment not found"})
+  const acceptedComment = await commentModel.findOneAndUpdate(
+    { _id: id },
+    { isAccept: 1 }
+  );
+  if (!acceptedComment) {
+    return res.status(404).json({ message: "comment not found" });
   }
-  return res.status(200).json({message : " comment accepted"})
-
-}
-exports.reject = async (req , res)=>{
-    const {id}= req.params
-  const isValid = mongoose.Types.ObjectId.isValid(id)
-  if (!isValid){
-    return res.status(409).json({message : "comment ID is not valid"})
+  return res.status(200).json({ message: " comment accepted" });
+};
+exports.reject = async (req, res) => {
+  const { id } = req.params;
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+  if (!isValid) {
+    return res.status(409).json({ message: "comment ID is not valid" });
   }
-  const rejectedComment = await commentModel.findOneAndUpdate({_id : id}, {isAccept:0})
-   if (!rejectedComment){
-   return res.status(404).json({message:"comment not found"})
+  const rejectedComment = await commentModel.findOneAndUpdate(
+    { _id: id },
+    { isAccept: 0 }
+  );
+  if (!rejectedComment) {
+    return res.status(404).json({ message: "comment not found" });
   }
-  return res.status(200).json({message : " comment rejected"})
-}
- exports.answer = async (req , res)=>{
-  const {id} = req.params
-  const {body} =req.body
-  const isValid = mongoose.Types.ObjectId.isValid(id)
-  if (!isValid){
-    return res.status(409).json({message : "comment id is not valid"})
+  return res.status(200).json({ message: " comment rejected" });
+};
+exports.answer = async (req, res) => {
+  const { id } = req.params;
+  const { body } = req.body;
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+  if (!isValid) {
+    return res.status(409).json({ message: "comment id is not valid" });
   }
-  const acceptedComment = await commentModel.findOneAndUpdate({_id:id}, {isAccept:1})
-  if(!acceptedComment){
-    return res.status(404).json({message : "comment not found"})
+  const acceptedComment = await commentModel.findOneAndUpdate(
+    { _id: id },
+    { isAccept: 1 }
+  );
+  if (!acceptedComment) {
+    return res.status(404).json({ message: "comment not found" });
   }
   const answerComment = await commentModel.create({
-       body,
+    body,
     course: acceptedComment.course,
     creator: req.user._id,
     isAnswer: 1,
     isAccept: 1,
-    mainCommentID: id
-  })
-  return res.status(201).json(answerComment)
- }
+    mainCommentID: id,
+  });
+  return res.status(201).json(answerComment);
+};
+exports.getAll = async (req, res) => {
+  const comments = await commentModel
+    .find()
+    .populate("course")
+    .populate("creator", "-password")
+    .lean();
+      let allComments = [];
+  comments.forEach((comment) => {
+    comments.forEach((answerComment) => {
+      if (String(comment._id) == String(answerComment.mainCommentID)) {
+        allComments.push({
+          ...comment,
+          course: comment.course.name,
+          creator: comment.creator.name,
+          answerComment,
+        });
+      }
+    });
+  });
+    return res.status(200).json(allComments)
+};
