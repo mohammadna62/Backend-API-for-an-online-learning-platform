@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 const contactModel = require("./../../models/contact");
-const emailValidation = require("./../../validators/email")
+const emailValidation = require("./../../validators/email");
 const mongoose = require("mongoose");
 
 exports.getAll = async (req, res) => {
@@ -9,11 +9,11 @@ exports.getAll = async (req, res) => {
 };
 exports.create = async (req, res) => {
   const { name, email, phone, body } = req.body;
- const emailValidator = emailValidation({email})
+  const emailValidator = emailValidation({ email });
 
- if (emailValidator !== true){
-    return res.status(422).json(emailValidator)
- }
+  if (emailValidator !== true) {
+    return res.status(422).json(emailValidator);
+  }
   const contact = await contactModel.create({
     name,
     email,
@@ -36,28 +36,29 @@ exports.remove = async (req, res) => {
   return res.status(201).json({ message: "contact deleted", deleteContact });
 };
 exports.answer = async (req, res) => {
-  
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: "adorable.creaturee@gmail.com",
-      pass: "lxno cqky yssx jjtr"
+      pass: "lxno cqky yssx jjtr",
     },
   });
-  const mailOption ={
-    from:"adorable.creaturee@gmail.com",
-    to:req.body.email,
-    subject : "ایمیل مهم برای شما ",
-    text:req.body.answer
-  }
- 
-  transporter.sendMail(mailOption,async(error, info)=>{
-   if(error){
-    return res.status(422).json({message: error})
-   }else{
-     const contact = await contactModel.findOneAndUpdate({ email: req.body.email},{answer : 1})
-    return res.status(200).json({message:"Email sent successfully"})
-   } 
-    
-  })
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: req.body.email,
+    subject: "Email From Mohammad Naghavi ",
+    text: req.body.answer,
+  };
+
+  transporter.sendMail(mailOptions, async (error, info) => {
+    if (error) {
+      return res.status(422).json({ message: error });
+    } else {
+      const contact = await contactModel.findOneAndUpdate(
+        { email: req.body.email },
+        { answer: 1 }
+      );
+      return res.status(200).json({ message: "Email sent successfully" });
+    }
+  });
 };
