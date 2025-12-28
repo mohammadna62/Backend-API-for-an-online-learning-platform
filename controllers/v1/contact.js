@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const contactModel = require("./../../models/contact");
+const emailValidation = require("./../../validators/email")
 const mongoose = require("mongoose");
 
 exports.getAll = async (req, res) => {
@@ -8,6 +9,11 @@ exports.getAll = async (req, res) => {
 };
 exports.create = async (req, res) => {
   const { name, email, phone, body } = req.body;
+ const emailValidator = emailValidation({email})
+
+ if (emailValidator !== true){
+    return res.status(422).json(emailValidator)
+ }
   const contact = await contactModel.create({
     name,
     email,
