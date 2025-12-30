@@ -57,4 +57,14 @@ exports.getAllByAdmin = async (req, res) => {
   return res.status(200).json(articles);
 };
 
-exports.publish = async (req, res) => {};
+exports.publish = async (req, res) => {
+  const {id}= req.params
+if(!mongoose.Types.ObjectId.isValid(id)){
+  return res.status(409).json({message: " the article Id is not valid"})
+}
+const publishArticle = await articleModel.findOneAndUpdate({_id:id},{publish:1})
+if(!publishArticle){
+  return res.status(409).json({message:"article not found"})
+}
+return res.status(200).json(publishArticle)
+};
