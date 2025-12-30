@@ -10,7 +10,7 @@ router.route("/").post(authMiddleware, ticketController.create).get(authMiddlewa
 router.route("/:id").delete(authMiddleware, isAdminMiddleware, ticketController.remove);
 router.route("/user").get(authMiddleware, ticketController.userTickets);
 router.route("/departments").get(authMiddleware, ticketController.departments);
-router.route("/departments-sub/:id").get(authMiddleware, ticketController.departmentsSubs);
+router.route("/departments/:id/sub").get(authMiddleware, ticketController.departmentsSubs);
 router.route("/answer").post(authMiddleware, isAdminMiddleware, ticketController.setAnswer);
 router.route("/:id/answer").get(authMiddleware,ticketController.getAnswer)
 // department and sub department router aria
