@@ -13,6 +13,7 @@ const searchRouter = require("./routes/v1/search");
 const notificationRouter = require("./routes/v1/notification");
 const offRouter = require("./routes/v1/off");
 const articleRouter = require("./routes/v1/article");
+const orderRouter = require("./routes/v1/order");
 
 const app = express();
 app.use(
@@ -34,5 +35,6 @@ app.use("/v1/search", searchRouter);
 app.use("/v1/notifications", notificationRouter);
 app.use("/v1/offs", offRouter);
 app.use("/v1/articles", articleRouter);
+app.use("/v1/order", orderRouter);
 
 module.exports = app;
