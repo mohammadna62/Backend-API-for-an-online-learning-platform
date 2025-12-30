@@ -25,16 +25,7 @@ router.route("/:href").get(articleController.getOne);
 router
   .route("/:id")
   .delete(authMiddleware, isAdminMiddleware, articleController.remove);
-router
-  .route("/draft")
-  .post(
-    authMiddleware,
-    isAdminMiddleware,
-    multer({ storage: multerStorage, limits: { fileSize: 1000000 } }).single(
-      "cover"
-    ),
-    articleController.saveDraft
-  );
+
 
 router
   .route("/:id/publish")

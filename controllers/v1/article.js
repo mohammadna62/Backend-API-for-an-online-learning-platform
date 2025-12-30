@@ -44,10 +44,8 @@ if(!mongoose.Types.ObjectId.isValid(id)){
   return res.status(409).json({message: " the article Id is not valid"})
 }
 const deleteArticle = await articleModel.findOneAndDelete({_id:id})
-return res.status(201).json({message:"article deleted" , deleteArticle})
+return res.status(201).json({message:"article deleted successfully" , deleteArticle})
 };
-
-exports.saveDraft = async (req, res) => {};
 
 exports.getAllByAdmin = async (req, res) => {
   const articles = await articleModel.find({}).populate("creator" ,"name").populate("categoryID");
