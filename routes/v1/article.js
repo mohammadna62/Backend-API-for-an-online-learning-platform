@@ -38,6 +38,6 @@ router
 
 router
   .route("/:id/publish")
-  .post(authMiddleware, isAdminMiddleware, articleController.publish);
+  .put(authMiddleware, isAdminMiddleware, articleController.publish);
 
 module.exports = router;

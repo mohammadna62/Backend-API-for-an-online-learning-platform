@@ -1,4 +1,5 @@
 const articleModel = require("./../../models/article");
+const mongoose = require ("mongoose")
 
 exports.getAll = async (req, res) => {
   const articles = await articleModel.find({ publish: 1 }).populate("creator" ,"name").populate("categoryID");
@@ -38,7 +39,12 @@ exports.getOne = async (req, res) => {
 };
 
 exports.remove = async (req, res) => {
-
+const {id}= req.params
+if(!mongoose.Types.ObjectId.isValid(id)){
+  return res.status(409).json({message: " the article Id is not valid"})
+}
+const deleteArticle = await articleModel.findOneAndDelete({_id:id})
+return res.status(201).json({message:"article deleted" , deleteArticle})
 };
 
 exports.saveDraft = async (req, res) => {};
