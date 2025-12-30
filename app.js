@@ -35,6 +35,6 @@ app.use("/v1/search", searchRouter);
 app.use("/v1/notifications", notificationRouter);
 app.use("/v1/offs", offRouter);
 app.use("/v1/articles", articleRouter);
-app.use("/v1/order", orderRouter);
+app.use("/v1/orders", orderRouter);
 
 module.exports = app;
