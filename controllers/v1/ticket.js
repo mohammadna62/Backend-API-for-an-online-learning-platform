@@ -18,12 +18,6 @@ exports.setAnswer = async (req, res) => {};
 
 exports.getAnswer = async (req, res) => {};
 
-// departments aria
 
-exports.createDepartments = async (req, res) => {};
 
-exports.createDepartmentsSubs = async (req, res) => {};
 
-exports.removeDepartments = async (req, res) => {};
-
-exports.removeDepartmentsSubs = async (req, res) => {};
